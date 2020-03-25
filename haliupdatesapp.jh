@@ -1,0 +1,157 @@
+/**
+ * JHipster JDL model for myMonolithApp
+ */
+entity Business {
+	businessName String required,
+    telephone String required,
+    simpleAbout String required,
+    moreAbout TextBlob required,
+    email String ,
+    fbk String,
+    link String,
+    twi String,
+    ytb String,
+    createDate Instant,
+	updateDate Instant
+    
+}
+entity OpeningHours{
+      dayOfWeek DayOfWeek,
+      opens String,
+      closes String
+}
+
+entity FrequentlyAskQuestion{
+      title String required,
+      details String required,
+      createDate Instant,
+	  updateDate Instant
+}
+
+entity Country {
+	countryName String required,
+    countryCode String required,
+    countryDailCode String required
+}
+
+// an ignored comment
+/** not an ignored comment */
+entity Address {
+    nickname String required,
+	streetAddress String required,
+	build String,
+	city String,
+	stateProvince String,
+    postalCode String,
+    latitude Double,
+    longitude Double,
+    verified Boolean
+}
+
+/**
+ * ==========================
+ * Media Tables
+ * */
+ entity Media{
+ 	url String,
+ 	title String,
+ 	description String,
+ 	mediaType MediaType
+ }
+
+ enum MediaType{
+ 	PHOTO, VIDEO
+ }
+ enum DayOfWeek{
+ 	 MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+ }
+
+ entity Album{
+ 	title String,
+ 	more TextBlob
+ }
+
+ entity ProfilePhoto{
+ 	title String,
+ 	more TextBlob
+
+ }
+ entity ServiceType{
+ 	url String,
+ 	title String,
+ 	description String
+ }
+
+  entity HashTag{
+ 	tagName String required unique
+ }
+
+
+
+ //==========================
+ entity FeedItem{
+ 	title String,
+ 	more TextBlob,
+ 	feedType FeedType
+ }
+
+  enum FeedType{
+ 	PHOTO, VIDEO
+ }
+ /**
+ * ==========================
+ * Media Tables
+ * */
+
+  //==========================
+
+
+relationship OneToOne {
+	//User{country} to Country,
+	Business{country(countryName)} to Country,
+    Business {address(nickname)} to Address,
+    Business {businessProfilePhoto} to Media
+
+
+}
+
+
+
+relationship ManyToMany {
+	Album{mediaItem} to Media{album},
+	ProfilePhoto{mediaItem} to Media{profilePhoto},
+	FeedItem{serviceType(title)} to ServiceType{feedItem},
+	Business{serviceType(title)} to ServiceType{business(businessName)},
+    Business{hashTag(tagName)} to HashTag{business(businessName)},
+    Album{hashTag (tagName)} to HashTag{album(title)},
+    ProfilePhoto{hashTag (tagName)} to HashTag{profilePhoto(title)}
+
+}
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+    Business{frequentlyAskQuestion(title)} to FrequentlyAskQuestion,
+    FeedItem{media} to Media,
+    Business{openingHour} to OpeningHours,
+    Business{album} to Album,
+    Business{profilePhoto} to ProfilePhoto,
+    //User{business} to Business,
+    //User{feedItem} to FeedItem
+}
+
+
+
+
+// Set pagination options
+paginate Business, FeedItem, FrequentlyAskQuestion with infinite-scroll
+paginate Media, Album, ProfilePhoto, Country with pagination
+
+// Use Data Transfert Objects (DTO)
+// dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl //except Business, Media,Album
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
+
